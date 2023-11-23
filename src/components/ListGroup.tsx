@@ -1,20 +1,12 @@
-import { Fragment } from "react";
-import { MouseEvent, useState } from "react";
+import { useState } from "react";
 
-interface Props {
-	items: string[];
-	heading: string;
-	onSelectItem: (item: string) => void;
-}
+let items = ["London", "New York", "Japan"];
 
-// function ListGroup(props: Props) {
-function ListGroup({ items, heading, onSelectItem }: Props) {
-	const [selectedIndex, setselectedIndex] = useState(-1);
-	// heading = "";
-
+const ListGroup = () => {
+	const [selectedIndex, setSelectedIndex] = useState(-1);
 	return (
-		<>
-			<h1>{heading}</h1>
+		<div>
+			<h1>ListGroup</h1>
 			<ul className="list-group">
 				{items.map((item, index) => (
 					<li
@@ -23,18 +15,15 @@ function ListGroup({ items, heading, onSelectItem }: Props) {
 								? "list-group-item active"
 								: "list-group-item"
 						}
-						key={item}
-						onClick={() => {
-							setselectedIndex(index);
-							onSelectItem(item);
-						}}
+						// className="list-group-item active"
+						onClick={() => setSelectedIndex(index)}
 					>
 						{item}
 					</li>
 				))}
 			</ul>
-		</>
+		</div>
 	);
-}
+};
 
 export default ListGroup;
