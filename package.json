@@ -13,6 +13,7 @@
     "@heroicons/react": "^2.0.18",
     "@types/styled-components": "^5.1.32",
     "bootstrap": "^5.2.3",
+    "immer": "^9.0.19",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.7.1",
