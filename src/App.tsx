@@ -7,69 +7,24 @@ import { FaLeaf } from "react-icons/fa";
 import produce from "immer";
 import Cart from "./components/Cart";
 import Navbar from "./components/Navbar";
+import ExpandableText from "./components/ExpandableText";
+import Forms from "./components/Forms";
 
 function App() {
-	const [AlertVisible, setAlertVisible] = useState(false);
-
-	const [product, setProduct] = useState(["Product1", "Product2"]);
-
-	const [game, setGame] = useState({
-		id: 1,
-		player: {
-			name: "john",
-		},
-	});
-
-	const [pizza, setPizza] = useState({
-		name: "Spicy Pepperoni",
-		toppings: ["Mushroom", "jam"],
-	});
-
-	const [cart, setCart] = useState({
-		discount: 1,
-		items: [
-			{
-				id: 1,
-				title: "Product 1",
-				quantity: 1,
-			},
-			{
-				id: 2,
-				title: "Product 2",
-				quantity: 1,
-			},
-		],
-	});
-
-	const handler = () => {
-		setGame({ ...game, player: { name: "janu" } });
-		setPizza({
-			...pizza,
-			toppings: pizza.toppings.map((top) =>
-				top === "Mushroom" ? "cheese" : top
-			),
-		});
-		setCart({
-			...cart,
-			items: cart.items.map((item) =>
-				item.id === 2 ? { ...item, quantity: 2 } : item
-			),
-		});
-	};
+	const handler = () => {};
 
 	return (
 		<div>
 			<Like onClick={handler}></Like>
-
-			<Cart cartItem={product} onClick={() => setProduct([])}></Cart>
-			<Navbar cartItemCount={product.length}></Navbar>
-			<p>{game.player.name}</p>
-			<p>{pizza.toppings}</p>
-			{cart.items.map((item) => (
-				<p key={item.id}>
-					{item.title}-{item.quantity}
-				</p>
-			))}
+			<ExpandableText maxLength={60} fullText={handler}>
+				Lorem ipsum dolor sit amet consectetur adipisicing elit. Veritatis
+				repellendus ex quibusdam, voluptate architecto quo ipsum harum ratione
+				ea. Corporis, consequuntur quaerat beatae debitis quis non culpa facilis
+				fuga libero temporibus deserunt veniam consectetur, animi iste facere
+				dignissimos aperiam provident ad. Voluptates ducimus nemo saepe iste
+				doloremque adipisci eveniet sint!
+			</ExpandableText>
+			<Forms></Forms>
 		</div>
 	);
 }
