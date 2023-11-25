@@ -22,12 +22,39 @@ function App() {
 
 	const [pizza, setPizza] = useState({
 		name: "Spicy Pepperoni",
-		toppings: ["Mushroom"],
+		toppings: ["Mushroom", "jam"],
+	});
+
+	const [cart, setCart] = useState({
+		discount: 1,
+		items: [
+			{
+				id: 1,
+				title: "Product 1",
+				quantity: 1,
+			},
+			{
+				id: 2,
+				title: "Product 2",
+				quantity: 1,
+			},
+		],
 	});
 
 	const handler = () => {
 		setGame({ ...game, player: { name: "janu" } });
-		setPizza({ ...pizza, toppings: [...pizza.toppings, "cheese"] });
+		setPizza({
+			...pizza,
+			toppings: pizza.toppings.map((top) =>
+				top === "Mushroom" ? "cheese" : top
+			),
+		});
+		setCart({
+			...cart,
+			items: cart.items.map((item) =>
+				item.id === 2 ? { ...item, quantity: 2 } : item
+			),
+		});
 	};
 
 	return (
@@ -38,6 +65,11 @@ function App() {
 			<Navbar cartItemCount={product.length}></Navbar>
 			<p>{game.player.name}</p>
 			<p>{pizza.toppings}</p>
+			{cart.items.map((item) => (
+				<p key={item.id}>
+					{item.title}-{item.quantity}
+				</p>
+			))}
 		</div>
 	);
 }
