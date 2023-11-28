@@ -13,17 +13,18 @@ interface Props {
 }
 
 const ExpenseList = ({ expense, onDelete }: Props) => {
-	if (expense.length === 0) return null;
-
+	{
+		if (expense.length == 0) return null;
+	}
 	return (
 		<>
 			<table className="table table-bordered">
 				<thead>
 					<tr>
-						<th>Description</th>
-						<th>Amount</th>
-						<th>Category</th>
-						<th></th>
+						<td>Description</td>
+						<td>Amount</td>
+						<td>Category</td>
+						<td></td>
 					</tr>
 				</thead>
 				<tbody>
@@ -37,7 +38,7 @@ const ExpenseList = ({ expense, onDelete }: Props) => {
 									className="btn btn-outline-danger"
 									onClick={() => onDelete(e.id)}
 								>
-									Danger
+									Delete
 								</button>
 							</td>
 						</tr>
@@ -46,7 +47,7 @@ const ExpenseList = ({ expense, onDelete }: Props) => {
 				<tfoot>
 					<tr>
 						<td>Total</td>
-						<td>{expense.reduce((acc, e) => e.amount + acc, 0)}</td>
+						<td>{expense.reduce((acc, e) => e.amount + acc, 0).toFixed(2)}</td>
 						<td></td>
 						<td></td>
 					</tr>

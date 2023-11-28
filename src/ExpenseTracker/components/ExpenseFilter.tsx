@@ -1,22 +1,25 @@
 import React from "react";
 import category from "../ExpenseCategory";
-interface Props {
-	onSelectCategories: (category: string) => void;
+
+interface Prob {
+	onSelect: (data: string) => void;
 }
 
-const ExpenseFilter = ({ onSelectCategories }: Props) => {
+const ExpenseFilter = ({ onSelect }: Prob) => {
 	return (
-		<select
-			className="form-select"
-			onChange={(event) => onSelectCategories(event.target.value)}
-		>
-			<option value="">All categories</option>
-			{category.map((e) => (
-				<option value={e} key={e}>
-					{e}
-				</option>
-			))}
-		</select>
+		<>
+			<select
+				name="form-select"
+				onChange={(event) => onSelect(event.target.value)}
+			>
+				<option value="">All category</option>
+				{category.map((e) => (
+					<option key={e} value={e}>
+						{e}
+					</option>
+				))}
+			</select>
+		</>
 	);
 };
 

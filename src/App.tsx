@@ -31,30 +31,26 @@ function App() {
 		},
 	]);
 
-	const [selectedCategory, setSelectedCategory] = useState("");
-
-	const visibleExpense = selectedCategory
-		? expense.filter((e) => e.category === selectedCategory)
+	const [category, setCategory] = useState("");
+	const validateExpense = category
+		? expense.filter((e) => e.category == category)
 		: expense;
-
 	return (
 		<div>
-			<div className="mb-3">
+			<div className="mb-5">
 				<ExpenseForm
-					list={(data) =>
+					onSubmit={(data) =>
 						setExpense([...expense, { ...data, id: expense.length + 1 }])
 					}
 				></ExpenseForm>
 			</div>
 			<div className="mb-3">
-				<ExpenseFilter
-					onSelectCategories={(category) => setSelectedCategory(category)}
-				></ExpenseFilter>
+				<ExpenseFilter onSelect={setCategory}></ExpenseFilter>
 			</div>
 			<ExpenseList
-				expense={visibleExpense}
+				expense={validateExpense}
 				onDelete={(id) => setExpense(expense.filter((e) => e.id !== id))}
-			/>
+			></ExpenseList>
 		</div>
 	);
 }
