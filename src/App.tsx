@@ -1,30 +1,60 @@
 import React, { useState } from "react";
-import Alert from "./components/Alert";
-import Button from "./components/Button/Button";
-import ListGroup from "./components/ListGroup";
-import Like from "./components/Button/Like";
-import { FaLeaf } from "react-icons/fa";
-import produce from "immer";
-import Cart from "./components/Cart";
-import Navbar from "./components/Navbar";
-import ExpandableText from "./components/ExpandableText";
-import Forms from "./components/Forms";
+import ExpenseList from "./ExpenseTracker/components/ExpenseList";
+import ExpenseFilter from "./ExpenseTracker/components/ExpenseFilter";
+import ExpenseForm from "./ExpenseTracker/components/ExpenseForm";
 
 function App() {
-	const handler = () => {};
+	const [expense, setExpense] = useState([
+		{
+			id: 1,
+			description: "des 1",
+			amount: 59,
+			category: "Utility",
+		},
+		{
+			id: 2,
+			description: "des 2",
+			amount: 59,
+			category: "Utility",
+		},
+		{
+			id: 3,
+			description: "des 3",
+			amount: 59,
+			category: "Utility",
+		},
+		{
+			id: 4,
+			description: "des 4",
+			amount: 59,
+			category: "Utility",
+		},
+	]);
+
+	const [selectedCategory, setSelectedCategory] = useState("");
+
+	const visibleExpense = selectedCategory
+		? expense.filter((e) => e.category === selectedCategory)
+		: expense;
 
 	return (
 		<div>
-			<Like onClick={handler}></Like>
-			<ExpandableText maxLength={60} fullText={handler}>
-				Lorem ipsum dolor sit amet consectetur adipisicing elit. Veritatis
-				repellendus ex quibusdam, voluptate architecto quo ipsum harum ratione
-				ea. Corporis, consequuntur quaerat beatae debitis quis non culpa facilis
-				fuga libero temporibus deserunt veniam consectetur, animi iste facere
-				dignissimos aperiam provident ad. Voluptates ducimus nemo saepe iste
-				doloremque adipisci eveniet sint!
-			</ExpandableText>
-			<Forms></Forms>
+			<div className="mb-3">
+				<ExpenseForm
+					list={(data) =>
+						setExpense([...expense, { ...data, id: expense.length + 1 }])
+					}
+				></ExpenseForm>
+			</div>
+			<div className="mb-3">
+				<ExpenseFilter
+					onSelectCategories={(category) => setSelectedCategory(category)}
+				></ExpenseFilter>
+			</div>
+			<ExpenseList
+				expense={visibleExpense}
+				onDelete={(id) => setExpense(expense.filter((e) => e.id !== id))}
+			/>
 		</div>
 	);
 }
