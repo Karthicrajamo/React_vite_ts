@@ -1,30 +1,13 @@
 import React, { useEffect, useState } from "react";
-import ExpenseList from "./ExpenseTracker/components/ExpenseList";
-import ExpenseFilter from "./ExpenseTracker/components/ExpenseFilter";
-import ExpenseForm from "./ExpenseTracker/components/ExpenseForm";
-import ProductList from "./ProductList";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import apiClient, { CanceledError } from "./Services/api-client";
-
-const schema = z.object({
-	title: z.string().min(3),
-	slug: z.string().min(0),
-	inventory: z.number(),
-	unit_price: z.number({ invalid_type_error: "Enter a price" }).min(0.01),
-	collection: z.number(),
-});
-
-type addUserFormData = z.infer<typeof schema>;
-interface User {
-	id: number;
-	title: string;
-	slug: string;
-	inventory: number;
-	unit_price: number;
-	collection: number;
-}
+import userService, {
+	User,
+	addUserFormData,
+	schema,
+} from "./Services/user-service";
 
 function App() {
 	const [users, setUsers] = useState<User[]>([]);
@@ -42,7 +25,8 @@ function App() {
 	const onDelete = (user: User) => {
 		const originalUsers = [...users];
 		setUsers(users.filter((u) => u.id !== user.id));
-		apiClient.delete("/products/" + user.id).catch((err) => {
+
+		userService.deleteUser(user.id).catch((err) => {
 			setError(err.message);
 			setUsers(originalUsers);
 		});
@@ -53,8 +37,8 @@ function App() {
 
 		setUsers([...users, { ...data, id: users.length + 1 }]);
 
-		apiClient
-			.post("/products/", data)
+		userService
+			.postUser(data)
 			.then(({ data: savedUser }) => setUsers([savedUser, ...users])) // { data: savedUser } --> (res.data)
 			// .then((data) => console.log(data))
 			.catch((err) => {
@@ -69,28 +53,20 @@ function App() {
 
 		setUsers(users.map((user) => (user.title === data.title ? update : user)));
 
-		apiClient
-			.put("/products/" + data.id, update)
-			// .then(({ data: updatedData }) => console.log(updatedData))
-			.catch((err) => {
-				setError(err.message);
-				setUsers(originalUsers);
-			});
+		userService.updateUser(update.id, update).catch((err) => {
+			setError(err.message);
+			setUsers(originalUsers);
+		});
 	};
 
 	// ################################ useEffect #######################################
 
 	useEffect(() => {
-		const controller = new AbortController();
 		setLoading(true);
 
-		apiClient
-			// .get<User[]>("http://127.0.0.1:8000/products/", {
-			.get<User[]>("/products/", {
-				signal: controller.signal,
-			})
+		const { request, cancel } = userService.getAllUsers();
+		request
 			.then((res) => {
-				// setUsers(res.data);
 				setUsers(res.data.results);
 				setLoading(false);
 			})
@@ -99,7 +75,7 @@ function App() {
 				setError(err.message);
 				setLoading(false);
 			});
-		return () => controller.abort();
+		return () => cancel();
 	}, []);
 
 	// ############################ RETURN ##############################
