@@ -14,7 +14,11 @@ interface User {
 }
 
 const schema = z.object({
-	title: z.string(),
+	title: z.string().min(3),
+	slug: z.string().min(0),
+	inventory: z.number(),
+	unit_price: z.number({ invalid_type_error: "Enter a price" }).min(0.01),
+	collection: z.number(),
 });
 
 type addUserFormData = z.infer<typeof schema>;
@@ -33,12 +37,15 @@ function App() {
 	const onDelete = (user: User) => {
 		const originalUsers = [...users];
 		setUsers(users.filter((u) => u.id !== user.id));
-		axios
-			.delete("https://jsonplaceholder.typicode.com/posts/" + user.id)
-			.catch((err) => {
-				setError(err.message);
-				setUsers(originalUsers);
-			});
+		axios.delete("http://localhost:8000/products/" + user.id).catch((err) => {
+			setError(err.message);
+			setUsers(originalUsers);
+		});
+	};
+
+	const onSubmit = (data: addUserFormData) => {
+		setUsers([...users, { ...data, id: users.length + 1 }]);
+		axios.post("http://localhost:8000/products/", data);
 	};
 
 	useEffect(() => {
@@ -46,12 +53,12 @@ function App() {
 		setLoading(true);
 		axios
 			// .get<User[]>("http://127.0.0.1:8000/products/", {
-			.get<User[]>("https://jsonplaceholder.typicode.com/posts", {
+			.get<User[]>("http://localhost:8000/products/", {
 				signal: controller.signal,
 			})
 			.then((res) => {
-				setUsers(res.data);
-				// setUsers(res.data.results);
+				// setUsers(res.data);
+				setUsers(res.data.results);
 				setLoading(false);
 			})
 			.catch((err) => {
@@ -62,20 +69,13 @@ function App() {
 		return () => controller.abort();
 	}, []);
 
-	// const addUser = ()
-
 	return (
 		<>
 			{error && <p className="text-danger">{error}</p>}
 			{isLoading && <div className="spinner-border"></div>}
-			<form
-				className="form-group"
-				onSubmit={handleSubmit((data) =>
-					setUsers([...users, { ...data, id: users.length + 1 }])
-				)}
-			>
+			<form className="form-group" onSubmit={handleSubmit(onSubmit)}>
 				<label htmlFor="addUser" className="form-label">
-					Add new User
+					Title
 				</label>
 				<input
 					{...register("title")}
@@ -83,6 +83,44 @@ function App() {
 					type="text"
 					className="form-control mb-3"
 				/>
+				<label htmlFor="slug" className="form-label">
+					Slug
+				</label>
+				<input
+					{...register("slug")}
+					id="slug"
+					type="text"
+					className="form-control mb-3"
+				/>
+				<label htmlFor="inventory" className="form-label">
+					Inventory
+				</label>
+				<input
+					{...register("inventory", { valueAsNumber: true })}
+					id="inventory"
+					type="number"
+					className="form-control mb-3"
+				/>
+				{errors.inventory && <p>{errors.inventory.message}</p>}
+				<label htmlFor="unit_price" className="form-label">
+					Unit Price
+				</label>
+				<input
+					{...register("unit_price", { valueAsNumber: true })}
+					id="unit_price"
+					type="number"
+					className="form-control mb-3"
+				/>
+				<label htmlFor="collection" className="form-label">
+					collection
+				</label>
+				<input
+					{...register("collection", { valueAsNumber: true })}
+					id="collection"
+					type="text"
+					className="form-control mb-3"
+				/>
+				{errors.collection && <p>{errors.collection.message}</p>}
 				<button className="btn btn-primary mb-3">Add</button>
 			</form>
 			<ul className="list-group">
