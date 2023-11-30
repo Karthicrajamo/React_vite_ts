@@ -1,25 +1,21 @@
-import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import apiClient, { CanceledError } from "./Services/api-client";
 import userService, {
 	User,
 	addUserFormData,
 	schema,
 } from "./Services/user-service";
+import useUser from "./hooks/useUser";
 
 function App() {
-	const [users, setUsers] = useState<User[]>([]);
-	const [error, setError] = useState("");
-	const [isLoading, setLoading] = useState(false);
-
 	const {
 		register,
 		handleSubmit,
 		formState: { errors },
 	} = useForm<addUserFormData>({ resolver: zodResolver(schema) });
 
+	const { users, error, isLoading, setError, setUsers } = useUser();
 	// ################################# METHODS #######################################
 
 	const onDelete = (user: User) => {
@@ -60,23 +56,6 @@ function App() {
 	};
 
 	// ################################ useEffect #######################################
-
-	useEffect(() => {
-		setLoading(true);
-
-		const { request, cancel } = userService.getAllUsers();
-		request
-			.then((res) => {
-				setUsers(res.data.results);
-				setLoading(false);
-			})
-			.catch((err) => {
-				if (err instanceof CanceledError) return;
-				setError(err.message);
-				setLoading(false);
-			});
-		return () => cancel();
-	}, []);
 
 	// ############################ RETURN ##############################
 
