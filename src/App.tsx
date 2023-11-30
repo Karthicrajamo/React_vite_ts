@@ -3,10 +3,10 @@ import ExpenseList from "./ExpenseTracker/components/ExpenseList";
 import ExpenseFilter from "./ExpenseTracker/components/ExpenseFilter";
 import ExpenseForm from "./ExpenseTracker/components/ExpenseForm";
 import ProductList from "./ProductList";
-import axios, { AxiosError, CanceledError } from "axios";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import apiClient, { CanceledError } from "./Services/api-client";
 
 const schema = z.object({
 	title: z.string().min(3),
@@ -42,7 +42,7 @@ function App() {
 	const onDelete = (user: User) => {
 		const originalUsers = [...users];
 		setUsers(users.filter((u) => u.id !== user.id));
-		axios.delete("http://localhost:8000/products/" + user.id).catch((err) => {
+		apiClient.delete("/products/" + user.id).catch((err) => {
 			setError(err.message);
 			setUsers(originalUsers);
 		});
@@ -52,8 +52,9 @@ function App() {
 		const originalUsers = [...users];
 
 		setUsers([...users, { ...data, id: users.length + 1 }]);
-		axios
-			.post("http://localhost:8000/products/", data)
+
+		apiClient
+			.post("/products/", data)
 			.then(({ data: savedUser }) => setUsers([savedUser, ...users])) // { data: savedUser } --> (res.data)
 			// .then((data) => console.log(data))
 			.catch((err) => {
@@ -68,8 +69,8 @@ function App() {
 
 		setUsers(users.map((user) => (user.title === data.title ? update : user)));
 
-		axios
-			.put("http://localhost:8000/products/" + data.id, update)
+		apiClient
+			.put("/products/" + data.id, update)
 			// .then(({ data: updatedData }) => console.log(updatedData))
 			.catch((err) => {
 				setError(err.message);
@@ -82,9 +83,10 @@ function App() {
 	useEffect(() => {
 		const controller = new AbortController();
 		setLoading(true);
-		axios
+
+		apiClient
 			// .get<User[]>("http://127.0.0.1:8000/products/", {
-			.get<User[]>("http://localhost:8000/products/", {
+			.get<User[]>("/products/", {
 				signal: controller.signal,
 			})
 			.then((res) => {
