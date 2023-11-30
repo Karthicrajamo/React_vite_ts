@@ -8,11 +8,6 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-interface User {
-	id: number;
-	title: string;
-}
-
 const schema = z.object({
 	title: z.string().min(3),
 	slug: z.string().min(0),
@@ -22,6 +17,14 @@ const schema = z.object({
 });
 
 type addUserFormData = z.infer<typeof schema>;
+interface User {
+	id: number;
+	title: string;
+	slug: string;
+	inventory: number;
+	unit_price: number;
+	collection: number;
+}
 
 function App() {
 	const [users, setUsers] = useState<User[]>([]);
@@ -34,6 +37,8 @@ function App() {
 		formState: { errors },
 	} = useForm<addUserFormData>({ resolver: zodResolver(schema) });
 
+	// ################################# METHODS #######################################
+
 	const onDelete = (user: User) => {
 		const originalUsers = [...users];
 		setUsers(users.filter((u) => u.id !== user.id));
@@ -44,9 +49,35 @@ function App() {
 	};
 
 	const onSubmit = (data: addUserFormData) => {
+		const originalUsers = [...users];
+
 		setUsers([...users, { ...data, id: users.length + 1 }]);
-		axios.post("http://localhost:8000/products/", data);
+		axios
+			.post("http://localhost:8000/products/", data)
+			.then(({ data: savedUser }) => setUsers([savedUser, ...users])) // { data: savedUser } --> (res.data)
+			// .then((data) => console.log(data))
+			.catch((err) => {
+				setError(err.message);
+				setUsers(originalUsers);
+			});
 	};
+
+	const onUpdate = (data: User) => {
+		const originalUsers = [...users];
+		const update = { ...data, title: data.title + "!" };
+
+		setUsers(users.map((user) => (user.title === data.title ? update : user)));
+
+		axios
+			.put("http://localhost:8000/products/" + data.id, update)
+			// .then(({ data: updatedData }) => console.log(updatedData))
+			.catch((err) => {
+				setError(err.message);
+				setUsers(originalUsers);
+			});
+	};
+
+	// ################################ useEffect #######################################
 
 	useEffect(() => {
 		const controller = new AbortController();
@@ -69,10 +100,13 @@ function App() {
 		return () => controller.abort();
 	}, []);
 
+	// ############################ RETURN ##############################
+
 	return (
 		<>
 			{error && <p className="text-danger">{error}</p>}
 			{isLoading && <div className="spinner-border"></div>}
+
 			<form className="form-group" onSubmit={handleSubmit(onSubmit)}>
 				<label htmlFor="addUser" className="form-label">
 					Title
@@ -123,6 +157,7 @@ function App() {
 				{errors.collection && <p>{errors.collection.message}</p>}
 				<button className="btn btn-primary mb-3">Add</button>
 			</form>
+
 			<ul className="list-group">
 				{users.map((user) => (
 					<li
@@ -130,12 +165,23 @@ function App() {
 						className="list-group-item d-flex justify-content-between"
 					>
 						{user.title}
-						<button
-							className="btn btn-outline-danger"
-							onClick={() => onDelete(user)}
-						>
-							Delete
-						</button>
+						<div>
+							<button
+								className="btn btn-outline-dark mx-1"
+								onClick={() => {
+									console.log(user);
+									onUpdate(user);
+								}}
+							>
+								Update
+							</button>
+							<button
+								className="btn btn-outline-danger"
+								onClick={() => onDelete(user)}
+							>
+								Delete
+							</button>
+						</div>
 					</li>
 				))}
 			</ul>
