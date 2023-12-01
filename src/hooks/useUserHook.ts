@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 import userService, { User } from "../Services/user-service";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import { CanceledError } from "../Services/api-client";
 
 const useUser = () => {
@@ -14,8 +12,8 @@ const useUser = () => {
 
 		const { request, cancel } = userService.getAllUsers();
 		request
-			.then((res) => {
-				setUsers(res.data.results);
+			.then(({ data }) => {
+				setUsers(data.results);
 				setLoading(false);
 			})
 			.catch((err) => {
